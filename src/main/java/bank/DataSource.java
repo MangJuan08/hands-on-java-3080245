@@ -10,7 +10,6 @@ public class DataSource {
     Connection connection = null;
     try {
       connection = java.sql.DriverManager.getConnection(DB_URL);
-      System.out.println("Connection Established");
     } catch (SQLException e) {
       e.printStackTrace();
       return null;
@@ -19,9 +18,9 @@ public class DataSource {
     return connection;
   }
 
-  public static void getAccounts() {
-    String sql = "SELECT * FROM accounts a where a.id = 10385";
-
+  public static Account getAccount(Integer accountId) {
+    String sql = "SELECT * FROM accounts a where a.id = " + accountId;
+    Account account = null;
     try (
 
         Connection conn = getConnection();
@@ -29,19 +28,21 @@ public class DataSource {
         java.sql.ResultSet rs = stmt.executeQuery(sql)) {
 
       // loop through the result set
-      while (rs.next()) {
-        System.out.println(
-            rs.getInt("id") + "\t" +
-                rs.getDouble("balance") + "\t" +
-                rs.getString("type"));
-
+      if (rs.next()) {
+        account = new Account(
+            rs.getInt("id"),
+            rs.getDouble("balance"),
+            rs.getString("type"));
+      } else {
+        System.out.println("No data found");
       }
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      e.printStackTrace();
     }
+    return account;
   }
 
-  public static Customer getACustomer(Integer customerId) {
+  public static Customer getACustomerViaCustomerId(Integer customerId) {
     String sql = "SELECT * FROM customers c where c.id = " + customerId;
     Customer customer = null;
     try (
@@ -64,19 +65,37 @@ public class DataSource {
       // loop through the result set
 
     } catch (SQLException e) {
-      System.out.println(e.getMessage());
+      e.printStackTrace();
     }
     return customer;
   }
 
-  public static void main(String[] args) {
-    Customer aCustomer = getACustomer(1109);
-    System.out.println(
-        aCustomer.getId() + "\t" +
-            aCustomer.getName() + "\t" +
-            aCustomer.getUsername() + "\t" +
-            aCustomer.getPassword() + "\t" +
-            aCustomer.getAccountId());
+  public static Customer getACustomerViaUsername(String username, String password) {
+    String sql = "SELECT * FROM customers c where c.username = " + username + " AND c.password = " + password;
+    Customer customer = null;
+    try (
+        Connection conn = getConnection();
+        java.sql.Statement stmt = conn.createStatement();
+        java.sql.ResultSet rs = stmt.executeQuery(sql)) {
+
+      if (rs.next()) {
+
+        customer = new Customer(
+            rs.getInt("id"),
+            rs.getString("name"),
+            rs.getString("username"),
+            rs.getString("password"),
+            rs.getInt("account_id"));
+
+      } else {
+        System.out.println("No data found.");
+      }
+      // loop through the result set
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return customer;
   }
 
 }

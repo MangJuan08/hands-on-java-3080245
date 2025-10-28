@@ -6,9 +6,9 @@ public class Account {
   private String type;
 
   public Account(int id, double balance, String type) {
-    setId(id);
-    setBalance(balance);
-    setType(type);
+    this.id = id;
+    this.balance = balance;
+    this.type = type;
   }
 
   public int getId() {
