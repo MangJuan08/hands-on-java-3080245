@@ -23,6 +23,7 @@ public class DataSource {
     String sql = "SELECT * FROM accounts a where a.id = 10385";
 
     try (
+
         Connection conn = getConnection();
         java.sql.Statement stmt = conn.createStatement();
         java.sql.ResultSet rs = stmt.executeQuery(sql)) {
@@ -33,39 +34,49 @@ public class DataSource {
             rs.getInt("id") + "\t" +
                 rs.getDouble("balance") + "\t" +
                 rs.getString("type"));
+
       }
     } catch (SQLException e) {
       System.out.println(e.getMessage());
     }
   }
 
-  public static void getCustomers() {
-    String sql = "SELECT * FROM customers c where c.id = 1109";
-
+  public static Customer getACustomer(Integer customerId) {
+    String sql = "SELECT * FROM customers c where c.id = " + customerId;
+    Customer customer = null;
     try (
         Connection conn = getConnection();
         java.sql.Statement stmt = conn.createStatement();
         java.sql.ResultSet rs = stmt.executeQuery(sql)) {
 
       if (rs.next()) {
-        while (rs.next()) {
-          System.out.println(
-              rs.getInt("id") + "\t" +
-                  rs.getString("name") + "\t" +
-                  rs.getString("username") + "\t" +
-                  rs.getString("password") + "\t" +
-                  rs.getString("account_id"));
-        }
+
+        customer = new Customer(
+            rs.getInt("id"),
+            rs.getString("name"),
+            rs.getString("username"),
+            rs.getString("password"),
+            rs.getInt("account_id"));
+
       } else {
         System.out.println("No data found.");
       }
+      // loop through the result set
 
     } catch (SQLException e) {
       System.out.println(e.getMessage());
     }
+    return customer;
   }
 
   public static void main(String[] args) {
-    getCustomers();
+    Customer aCustomer = getACustomer(1109);
+    System.out.println(
+        aCustomer.getId() + "\t" +
+            aCustomer.getName() + "\t" +
+            aCustomer.getUsername() + "\t" +
+            aCustomer.getPassword() + "\t" +
+            aCustomer.getAccountId());
   }
+
 }
